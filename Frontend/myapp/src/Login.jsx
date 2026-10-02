@@ -12,44 +12,79 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const [fieldError, setFieldError] = useState({})
   const Navigate = useNavigate();
 
   // Input change ke liye
   const LoginHandlerInput = (e) => {
     const { name, value } = e.target;
     setLoginForm({ ...loginForm, [name]: value });
+
+    setFieldError({
+      ...fieldError,
+      [name] : "",
+    })
   };
 
-  // Form submit ke liye
-  const LoginHandler = async (e) => {
-    e.preventDefault();
+ const LoginHandler = async (e) => {
+  e.preventDefault();
 
-    try {
-      setError("");
-      setLoading(true);
+  const newError = {};
 
-      const response = await axios.post("http://localhost:8090/login-user", {
+  if (loginForm.email === "") {
+    newError.email = "Email field is required";
+  }
+
+  if (loginForm.password === "") {
+    newError.password = "Password field is required";
+  } else if(loginForm.password.length<8) {
+    newError.password = "Password must be at least 8 characters"
+  }
+
+  setFieldError(newError);
+
+  // Validation error hai to API call nahi hogi
+  if (Object.keys(newError).length > 0) {
+    return;
+  }
+
+  try {
+    setError("");
+    setLoading(true);
+
+    const response = await axios.post(
+      "http://localhost:8090/login-user",
+      {
         email: loginForm.email,
         password: loginForm.password,
-      });
-
-      console.log("Response >>>>>>", response.data);
-
-      if (response.data.status) {
-        toast.success("Login successfull");
-        console.log("Login Successfully");
-        console.log("Token >>>>>>", response.data.token);
       }
-    } catch (err) {
-      const message = 
-        err.response?.data?.message || "Login failed. Check your email and password."
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
+    );
+
+    console.log("Response >>>>>>", response.data);
+
+    if (response.data.status) {
+      toast.success("Login successful");
+
+      console.log("Login Successfully");
+      console.log("Token >>>>>>", response.data.token);
+
+      Navigate("/dashboard");
     }
-  };
+    else {
+      setError(response.data.message);
+      toast.error(response.data.message)
+    }
+  } catch (err) {
+    const message =
+      err.response?.data?.message ||
+      "Login failed. Check your email and password.";
+
+    setError(message);
+    toast.error(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const inputClass =
     "w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[15px] text-white placeholder-slate-500 outline-none transition focus:border-teal-300/60 focus:bg-white/[0.07] focus:ring-4 focus:ring-teal-300/10";
@@ -160,8 +195,18 @@ const Login = () => {
                   placeholder="you@example.com"
                   value={loginForm.email}
                   onChange={LoginHandlerInput}
-                  className={inputClass}
+                  className={`${inputClass} pr-16 ${
+    fieldError.email
+      ? "border-red-400/50 focus:border-red-400"
+      : ""
+  }`}
                 />
+                {fieldError.email && (
+  <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-400">
+    <span>!</span>
+    {fieldError.email}
+  </p>
+)}
               </div>
 
               {/* Password */}
@@ -190,8 +235,18 @@ const Login = () => {
                     placeholder="Your password"
                     value={loginForm.password}
                     onChange={LoginHandlerInput}
-                    className={`${inputClass} pr-16`}
+                    className={`${inputClass} pr-16  ${
+    fieldError.password
+      ? "border-red-400/50 focus:border-red-400"
+      : ""
+  }`}
                   />
+                  {fieldError.password && (
+  <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-400">
+    <span>!</span>
+    {fieldError.password}
+  </p>
+)}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}

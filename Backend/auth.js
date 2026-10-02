@@ -2,7 +2,23 @@ const jwt = require("jsonwebtoken");
 
 const auth = (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).send({
+        status: false,
+        message: "Authorization token is required",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).send({
+        status: false,
+        message: "Token is missing",
+      });
+    }
 
     console.log("token >>>", token);
 
@@ -13,7 +29,6 @@ const auth = (req, res, next) => {
     req.user = decode;
 
     next();
-
   } catch (error) {
     console.log("JWT Error >>>", error.message);
 
@@ -25,4 +40,3 @@ const auth = (req, res, next) => {
 };
 
 module.exports = auth;
-

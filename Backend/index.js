@@ -4,11 +4,19 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const otpGenerator = require("otp-generator");
 const jwt = require("jsonwebtoken");
+const nodemailer = require('nodemailer')
 const auth = require("./auth.js");
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const transport = nodemailer.createTransport({
+  service : "gmail",
+  auth : {
+    user : "vanshkumawat2106@gmail.com",
+    pass : "kimlykbcplsvklns"
+  }
+})
 
 mongoose
   .connect("mongodb://localhost:27017/15DayUser")
@@ -39,6 +47,8 @@ const otpSchema = mongoose.Schema({
   },
   otp : String
 })
+
+
 
 // User model
 const User = mongoose.model("User", userSchema);
@@ -142,11 +152,21 @@ app.post("/otp-generate", async (req, res) => {
 
     console.log("OTP Saved>>>>", saveOtp)
 
+    await transport.sendMail({
+      from : "vanshkumawat2106@gmail.com",
+      to : "kumawatvansh765@gmail.com",
+      subject : "welcome to my page",
+      text : `Your OTP is ${otp}`,
+      html : `<h1>OTP : ${otp}</h1>`
+    })
+
     return res.send({
       status: true,
-      message: "OTP generated successfully",
+      message: "OTP generated and sent successfully",
       otp: otp,
     });
+
+
   } catch (error) {
     console.log("OTP Generate Error >>>>>", error);
 
@@ -271,6 +291,14 @@ app.post("/forget-password", async (req, res) => {
     await userEmail.save();
 
     console.log("OTP Saved >>>>>>>", userEmail);
+
+    transport.sendMail({
+      from:"vanshkumawat2106@gmail.com",
+      to : "kumawatvansh765@gmail.com",
+      subject : "OTP",
+       text : `Forget Password OTP is ${otp}`,
+      html : `<h1>OTP : ${otp}</h1>`
+    })
 
     return res.send({
       status: true,
