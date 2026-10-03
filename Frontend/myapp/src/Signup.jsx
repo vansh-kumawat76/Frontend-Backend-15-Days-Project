@@ -119,8 +119,12 @@ const Signup = () => {
     if (form.email === "")
       newError.email = "Email field is required";
 
-    if (form.password === "")
+  if (form.password === "") {
       newError.password = "Password field is required";
+  }
+else if(form.password.length<8) {
+    newError.password = "Password must be at least 8 characters"
+  }
 
     if (form.gender === "")
       newError.gender = "Please select your gender";

@@ -154,7 +154,7 @@ app.post("/otp-generate", async (req, res) => {
 
     await transport.sendMail({
       from : "vanshkumawat2106@gmail.com",
-      to : "kumawatvansh765@gmail.com",
+      to : email,
       subject : "welcome to my page",
       text : `Your OTP is ${otp}`,
       html : `<h1>OTP : ${otp}</h1>`
@@ -292,9 +292,9 @@ app.post("/forget-password", async (req, res) => {
 
     console.log("OTP Saved >>>>>>>", userEmail);
 
-    transport.sendMail({
+   await transport.sendMail({
       from:"vanshkumawat2106@gmail.com",
-      to : "kumawatvansh765@gmail.com",
+      to : email,
       subject : "OTP",
        text : `Forget Password OTP is ${otp}`,
       html : `<h1>OTP : ${otp}</h1>`
@@ -400,6 +400,7 @@ app.post("/reset-password", async (req, res) => {
     });
   }
 });
+
 app.listen(8090, () => {
   console.log("server is started");
 });

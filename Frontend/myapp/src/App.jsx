@@ -8,6 +8,7 @@ import OtpPage from './assets/OtpPage'
 import ResetPassword from './assets/ResetPassword'
 import {ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+
 const App = () => {
   return (
 <>
@@ -19,6 +20,7 @@ const App = () => {
     <Route path='/forgetPassword' element={<ForgetPassword/>}/>
     <Route path='/otpPage' element={<OtpPage/>}/>
     <Route path='/resetPassword' element={<ResetPassword/>}/>
+
    </Routes>
    </BrowserRouter>
    <ToastContainer/>
